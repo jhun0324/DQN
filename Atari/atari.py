@@ -122,6 +122,10 @@ def main() :
 					print("Loss : {}".format(loss))
 					sess.run(copy_ops)
 
+				if episode % 1000 == 0 :
+					save_path = saver.save(sess, "./saved_networks/Pong-v0", global_step = episode)
+					print("Model saved in file : %s" % save_path)
+
 		except KeyboardInterrupt :
 			print("KeyboardInterrupt occured. Saving the model...")
 			save_path = saver.save(sess, "./saved_networks/Pong-v0", global_step = episode)
