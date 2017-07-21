@@ -13,7 +13,7 @@ input_size = 160
 output_size = 6
 
 GAMMA = 0.98
-REPLAY_MEMORY = 50000
+REPLAY_MEMORY = 20000
 REWARD_COUNT = 10
 
 def replay_train(mainDQN, targetDQN, train_batch) :
@@ -116,19 +116,21 @@ def main() :
 					pass
 
 				if episode % 10 == 1 :
+					total_loss = 0
 					for _ in range(50) :
 						minibatch = random.sample(replay_buffer, 10)
 						loss, _ = replay_train(mainDQN, targetDQN, minibatch)
-					print("Loss : {}".format(loss))
+						total_loss += loss
+					print("Loss : {}".format(total_loss))
 					sess.run(copy_ops)
 
 				if episode != 0 and episode % 1000 == 0 :
-					save_path = saver.save(sess, "./saved_networks/Pong-v0", global_step = episode)
+					save_path = saver.save(sess, "./saved_networks/Pong-v0")
 					print("Model saved in file : %s" % save_path)
 
 		except KeyboardInterrupt :
 			print("KeyboardInterrupt occured. Saving the model...")
-			save_path = saver.save(sess, "./saved_networks/Pong-v0", global_step = episode)
+			save_path = saver.save(sess, "./saved_networks/Pong-v0")
 			print("Model saved in file : %s" % save_path)
 			env.close()
 
