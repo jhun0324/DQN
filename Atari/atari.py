@@ -12,8 +12,8 @@ env = gym.make('Pong-v0')
 input_size = 160
 output_size = 6
 
-GAMMA = 0.99
-REPLAY_MEMORY = 10000
+GAMMA = 0.98
+REPLAY_MEMORY = 50000
 REWARD_COUNT = 10
 
 def replay_train(mainDQN, targetDQN, train_batch) :
@@ -51,7 +51,7 @@ def preprocess(state) :
 	return resized_gray_state
 
 def main() :
-	max_episode = 1000
+	max_episode = 3000
 	replay_buffer = deque()
 	rewards_list = []
 
@@ -98,7 +98,7 @@ def main() :
 					if done :
 						break
 
-					elif total_reward > 50 :
+					elif total_reward > 20 :
 						break
 
 				print("Episode : {} total reward : {}".format(episode, total_reward))
@@ -108,11 +108,11 @@ def main() :
 				if len(rewards_list) > REWARD_COUNT :
 					rewards_list.pop(0)
 
-				if sum(rewards_list) / float(len(rewards_list)) > 50000 :
+				if sum(rewards_list) / float(len(rewards_list)) > 20 :
 					print("Training is done at {}".format(episode))
 					break
 
-				if total_reward > 50 :
+				if total_reward > 20 :
 					pass
 
 				if episode % 10 == 1 :
@@ -122,7 +122,7 @@ def main() :
 					print("Loss : {}".format(loss))
 					sess.run(copy_ops)
 
-				if episode % 1000 == 0 :
+				if episode != 0 and episode % 1000 == 0 :
 					save_path = saver.save(sess, "./saved_networks/Pong-v0", global_step = episode)
 					print("Model saved in file : %s" % save_path)
 
