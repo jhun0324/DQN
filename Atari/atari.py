@@ -9,12 +9,13 @@ import tensorflow as tf
 
 
 env = gym.make('Pong-v0')
-input_size = 160
+input_size = 84
 output_size = 6
 
 GAMMA = 0.98
 REPLAY_MEMORY = 15000
 REWARD_COUNT = 10
+load = False
 
 def replay_train(mainDQN, targetDQN, train_batch) :
 	x_stack = np.empty(0).reshape(0, mainDQN.input_size, mainDQN.input_size, 4)
@@ -47,8 +48,9 @@ def get_copy_var_ops(*, dest_scope_name = "target", src_scope_name = "main") :
 
 def preprocess(state) :
 	gray_state = np.asarray(cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)) / 255.
-	resized_gray_state = cv2.resize(gray_state, (160, 160))
-	return resized_gray_state
+	resized_gray_state = cv2.resize(gray_state, (110, 84))
+	modified_state = resized_gray_state[:, 12:96]
+	return modified_state
 
 def main() :
 	max_episode = 3000
@@ -63,7 +65,7 @@ def main() :
 			saver = tf.train.Saver()
 			tf.global_variables_initializer().run()
 			checkpoint = tf.train.get_checkpoint_state("saved_networks")
-			if checkpoint and checkpoint.model_checkpoint_path:
+			if load and checkpoint and checkpoint.model_checkpoint_path:
 				saver.restore(sess, checkpoint.model_checkpoint_path)
 				print("Successfully loaded:", checkpoint.model_checkpoint_path)
 			else:
@@ -86,7 +88,7 @@ def main() :
 						action = np.argmax(mainDQN.predict(states))
 
 					new_state, reward, done, _ = env.step(action)
-					new_state = np.reshape(preprocess(new_state), (160, 160, 1))
+					new_state = np.reshape(preprocess(new_state), (84, 84, 1))
 					new_states = np.append(new_state, states[:,:,:3], axis = 2)
 
 					replay_buffer.append((states, action, reward, done, new_states))
@@ -115,16 +117,16 @@ def main() :
 				if total_reward > 20 :
 					pass
 
-				if episode % 10 == 1 :
+				if episode > 100 and episode % 10 == 1 :
 					total_loss = 0
 					for _ in range(50) :
-						minibatch = random.sample(replay_buffer, 10)
+						minibatch = random.sample(replay_buffer, 20)
 						loss, _ = replay_train(mainDQN, targetDQN, minibatch)
 						total_loss += loss
 					print("Loss : {}".format(total_loss))
 					sess.run(copy_ops)
 
-				if episode != 0 and episode % 1000 == 0 :
+				if episode != 0 and episode % 200 == 0 :
 					save_path = saver.save(sess, "./saved_networks/Pong-v0")
 					print("Model saved in file : %s" % save_path)
 
