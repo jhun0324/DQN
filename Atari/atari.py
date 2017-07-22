@@ -53,7 +53,7 @@ def preprocess(state) :
 	return modified_state
 
 def main() :
-	max_episode = 3000
+	max_episode = 100000
 	replay_buffer = deque()
 	rewards_list = []
 
