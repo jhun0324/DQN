@@ -1,3 +1,2 @@
-model_checkpoint_path: "Pong-v0-495"
-all_model_checkpoint_paths: "Pong-v0-0"
-all_model_checkpoint_paths: "Pong-v0-495"
+model_checkpoint_path: "Pong-v0"
+all_model_checkpoint_paths: "Pong-v0"
