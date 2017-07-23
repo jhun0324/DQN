@@ -16,7 +16,6 @@ GAMMA = 0.98
 REPLAY_MEMORY = 15000
 REWARD_COUNT = 10
 load = False
-e = 1.0
 
 def replay_train(mainDQN, targetDQN, train_batch) :
 	x_stack = np.empty(0).reshape(0, mainDQN.input_size, mainDQN.input_size, 4)
@@ -78,6 +77,7 @@ def main() :
 			
 			copy_ops = get_copy_var_ops(dest_scope_name = "target", src_scope_name = "main")
 			sess.run(copy_ops)
+			e = 1.0
 
 			for episode in range(max_episode) :
 				state = env.reset()
