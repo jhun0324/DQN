@@ -15,7 +15,7 @@ output_size = 6
 GAMMA = 0.98
 REPLAY_MEMORY = 15000
 REWARD_COUNT = 10
-load = True
+load = False
 e = 1.0
 
 def replay_train(mainDQN, targetDQN, train_batch) :
