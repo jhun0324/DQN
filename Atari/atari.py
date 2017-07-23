@@ -16,6 +16,7 @@ GAMMA = 0.98
 REPLAY_MEMORY = 15000
 REWARD_COUNT = 10
 load = True
+e = 1.0
 
 def replay_train(mainDQN, targetDQN, train_batch) :
 	x_stack = np.empty(0).reshape(0, mainDQN.input_size, mainDQN.input_size, 4)
@@ -52,6 +53,10 @@ def preprocess(state) :
 	modified_state = resized_gray_state[:, 12:96]
 	return modified_state
 
+def update_e(reward) :
+	e = -0.023 * reward + 0.525
+	return e
+
 def main() :
 	max_episode = 100000
 	replay_buffer = deque()
@@ -75,7 +80,6 @@ def main() :
 			sess.run(copy_ops)
 
 			for episode in range(max_episode) :
-				e = 1. / ((episode / 10) + 1)
 				state = env.reset()
 				state = preprocess(state) 
 				states = np.stack((state, state, state, state), axis = 2)
@@ -96,6 +100,7 @@ def main() :
 						replay_buffer.popleft()
 					states = new_states
 					total_reward += reward
+					e = update_e(total_reward)
 
 					if done :
 						break
