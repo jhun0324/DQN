@@ -121,7 +121,7 @@ def main() :
 				if total_reward > 20 :
 					pass
 
-				if episode > 40000 and episode % 20 == 1 :
+				if episode % 20 == 1 :
 					total_loss = 0
 					for _ in range(50) :
 						minibatch = random.sample(replay_buffer, 30)
