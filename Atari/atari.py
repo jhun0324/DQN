@@ -6,6 +6,8 @@ import convDQN
 import random
 from collections import deque
 import tensorflow as tf
+import pickle
+
 
 
 env = gym.make('Pong-v0')
@@ -52,13 +54,14 @@ def preprocess(state) :
 	modified_state = resized_gray_state[:, 12:96]
 	return modified_state
 
-def update_e(episode) :
-	return min(0.1, -(0.9 / 100000) * episode + 1)
+def update_e(training_number) :
+	return min(0.1, -(0.9 / 100000) * training_number + 1)
 
 def main() :
 	max_episode = 100000
 	replay_buffer = deque()
 	rewards_list = []
+	training_number = pickle.load(open("./saved_networks/training_number.p", "rb"))
 
 	with tf.Session() as sess :
 		try :
@@ -99,7 +102,7 @@ def main() :
 						replay_buffer.popleft()
 					states = new_states
 					total_reward += reward
-					e = update_e(total_reward)
+					e = update_e(training_number)
 
 					if done :
 						break
@@ -108,7 +111,7 @@ def main() :
 						break
 
 				print("Episode : {} total reward : {}".format(episode, total_reward))
-
+				training_number += 1
 				rewards_list.append(total_reward)
 
 				if len(rewards_list) > REWARD_COUNT :
@@ -130,14 +133,18 @@ def main() :
 					print("Loss : {}".format(total_loss))
 					sess.run(copy_ops)
 
-				if episode != 0 and episode % 200 == 0 :
+				if episode != 0 and episode % 300 == 0 :
 					save_path = saver.save(sess, "./saved_networks/Pong-v0")
+					pickle.dump(training_number, open("./saved_networks/training_number.p", "wb"))
 					print("Model saved in file : %s" % save_path)
+					print("Total training number : %s" % training_number)
 
 		except KeyboardInterrupt :
 			print("KeyboardInterrupt occured. Saving the model...")
 			save_path = saver.save(sess, "./saved_networks/Pong-v0")
+			pickle.dump(training_number, open("./saved_networks/training_number.p", "wb"))
 			print("Model saved in file : %s" % save_path)
+			print("Total training number : %s" % training_number)
 			env.close()
 
 if __name__ == '__main__' :
