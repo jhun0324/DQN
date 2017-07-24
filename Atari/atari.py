@@ -13,7 +13,7 @@ input_size = 84
 output_size = 6
 
 GAMMA = 0.98
-REPLAY_MEMORY = 15000
+REPLAY_MEMORY = 40000
 REWARD_COUNT = 10
 load = True
 
@@ -52,9 +52,8 @@ def preprocess(state) :
 	modified_state = resized_gray_state[:, 12:96]
 	return modified_state
 
-def update_e(reward) :
-	e = -0.023 * reward + 0.525
-	return e
+def update_e(episode) :
+	return min(0.1, -(0.9 / 100000) * episode + 1)
 
 def main() :
 	max_episode = 100000
@@ -122,10 +121,10 @@ def main() :
 				if total_reward > 20 :
 					pass
 
-				if episode > 100 and episode % 10 == 1 :
+				if episode > 40000 and episode % 20 == 1 :
 					total_loss = 0
 					for _ in range(50) :
-						minibatch = random.sample(replay_buffer, 20)
+						minibatch = random.sample(replay_buffer, 30)
 						loss, _ = replay_train(mainDQN, targetDQN, minibatch)
 						total_loss += loss
 					print("Loss : {}".format(total_loss))
