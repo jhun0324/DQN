@@ -12,8 +12,9 @@ while True :
 	print(action)
 	state, reward, done, info = env.step(action)
 	gray_state = np.asarray(cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)) / 255.
-	gray_state = cv2.resize(gray_state, (110, 84))
-	gray_state = gray_state[:, 12:96]
+	print(gray_state.shape)
+	gray_state = cv2.resize(gray_state, (80, 105))
+	gray_state = gray_state[17:97, :]
 	print(gray_state.shape)
 	plt.imshow(gray_state, cmap = 'gray')
 	plt.show()

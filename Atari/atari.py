@@ -11,7 +11,7 @@ import pickle
 
 
 env = gym.make('Pong-v0')
-input_size = 84
+input_size = 80
 output_size = 6
 
 GAMMA = 0.98
@@ -50,17 +50,20 @@ def get_copy_var_ops(*, dest_scope_name = "target", src_scope_name = "main") :
 
 def preprocess(state) :
 	gray_state = np.asarray(cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)) / 255.
-	resized_gray_state = cv2.resize(gray_state, (110, 84))
-	modified_state = resized_gray_state[:, 12:96]
+	resized_gray_state = cv2.resize(gray_state, (80, 105))
+	modified_state = resized_gray_state[17:97, :]
 	return modified_state
 
 def update_e(training_number) :
-	return min(0.1, -(0.9 / 100000) * training_number + 1)
+	return max(0.1, -(0.9 / 500000) * training_number + 1)
 
 def main() :
 	max_episode = 100000
 	replay_buffer = deque()
 	rewards_list = []
+	if not load :
+		training_number = 0
+		pickle.dump(training_number, open("./saved_networks/training_number.p", "wb"))
 	training_number = pickle.load(open("./saved_networks/training_number.p", "rb"))
 
 	with tf.Session() as sess :
@@ -94,7 +97,7 @@ def main() :
 						action = np.argmax(mainDQN.predict(states))
 
 					new_state, reward, done, _ = env.step(action)
-					new_state = np.reshape(preprocess(new_state), (84, 84, 1))
+					new_state = np.reshape(preprocess(new_state), (80, 80, 1))
 					new_states = np.append(new_state, states[:,:,:3], axis = 2)
 
 					replay_buffer.append((states, action, reward, done, new_states))
@@ -124,16 +127,16 @@ def main() :
 				if total_reward > 20 :
 					pass
 
-				if episode % 20 == 1 :
+				if episode > REPLAY_MEMORY and episode % 20 == 0 :
 					total_loss = 0
 					for _ in range(50) :
-						minibatch = random.sample(replay_buffer, 30)
+						minibatch = random.sample(replay_buffer, 32)
 						loss, _ = replay_train(mainDQN, targetDQN, minibatch)
 						total_loss += loss
 					print("Loss : {}".format(total_loss))
 					sess.run(copy_ops)
 
-				if episode != 0 and episode % 300 == 0 :
+				if episode != 0 and episode % 500 == 0 :
 					save_path = saver.save(sess, "./saved_networks/Pong-v0")
 					pickle.dump(training_number, open("./saved_networks/training_number.p", "wb"))
 					print("Model saved in file : %s" % save_path)

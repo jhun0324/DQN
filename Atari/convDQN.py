@@ -3,7 +3,7 @@ import numpy as np
 
 
 class ConvDQN :
-	def __init__(self, sess, input_size = 84, output_size = 6, learning_rate = 2e-5, name = 'main') :
+	def __init__(self, sess, input_size = 84, output_size = 6, learning_rate = 1e-6, name = 'main') :
 		'''
 			input_size = one scalr value that represents the height of the preprocessed image (height = width)
 		'''
@@ -17,19 +17,20 @@ class ConvDQN :
 
 	def _build_network(self) :
 		with tf.variable_scope(self.net_name) :
-			W_conv1 = weight_variable([8, 8, 4, 16])
-			b_conv1 = bias_variable([16])
+			W_conv1 = weight_variable([8, 8, 4, 32])
+			b_conv1 = bias_variable([32])
 
-			W_conv2 = weight_variable([4, 4, 16, 32])
-			b_conv2 = bias_variable([32])
+			W_conv2 = weight_variable([4, 4, 32, 64])
+			b_conv2 = bias_variable([64])
 
-			# W_conv3 = weight_variable([3, 3, 32, 32])
-			# b_conv3 = bias_variable([32])
+			W_conv3 = weight_variable([3, 3, 64, 64])
+			b_conv3 = bias_variable([64])
 
-			W_fc1 = weight_variable([288, 256])
+			W_fc1 = weight_variable([256, 256])
 			b_fc1 = bias_variable([256])
 
 			W_fc2 = weight_variable(shape = [256, self.output_size])
+			b_fc2 = bias_variable([self.output_size])
 				
 			self._X = tf.placeholder(shape = [None, self.input_size, self.input_size, 4], dtype = tf.float32)
 	    
@@ -37,16 +38,16 @@ class ConvDQN :
 			h_conv1 = tf.nn.relu(conv2d(self._X, W_conv1, 4) + b_conv1)
 			h_pool1 = max_pool_2x2(h_conv1)
 
-
 			h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 2) + b_conv2)
 			h_pool2 = max_pool_2x2(h_conv2)
 
-			# h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1) + b_conv3)
+			h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1) + b_conv3)
+			h_pool3 = max_pool_2x2(h_conv3)
 
-			h_conv2_flat = tf.reshape(h_pool2, [-1, 288])
-			h_fc1 = tf.nn.relu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
+			h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
+			h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
 
-			self._Qpred = tf.matmul(h_fc1, W_fc2)
+			self._Qpred = tf.matmul(h_fc1, W_fc2) + b_fc2
 
 		self._Y = tf.placeholder(shape = [None, self.output_size], dtype = tf.float32)
 		self._loss = tf.reduce_mean(tf.square(self._Y - self._Qpred))
