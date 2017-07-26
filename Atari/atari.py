@@ -127,7 +127,7 @@ def main() :
 				if total_reward > 20 :
 					pass
 
-				if episode > REPLAY_MEMORY and episode % 20 == 0 :
+				if training_number > REPLAY_MEMORY and episode % 20 == 0 :
 					total_loss = 0
 					for _ in range(50) :
 						minibatch = random.sample(replay_buffer, 32)
