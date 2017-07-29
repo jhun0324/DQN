@@ -17,7 +17,7 @@ output_size = 6
 GAMMA = 0.98
 REPLAY_MEMORY = 40000
 REWARD_COUNT = 10
-load = False
+load = True
 
 def replay_train(mainDQN, targetDQN, train_batch) :
 	x_stack = np.empty(0).reshape(0, mainDQN.input_size, mainDQN.input_size, 4)
