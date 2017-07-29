@@ -17,7 +17,7 @@ output_size = 6
 GAMMA = 0.98
 REPLAY_MEMORY = 40000
 REWARD_COUNT = 10
-load = True
+load = False
 
 def replay_train(mainDQN, targetDQN, train_batch) :
 	x_stack = np.empty(0).reshape(0, mainDQN.input_size, mainDQN.input_size, 4)
@@ -55,7 +55,7 @@ def preprocess(state) :
 	return modified_state
 
 def update_e(training_number) :
-	return max(0.1, -(0.9 / 500000) * training_number + 1)
+	return max(0.1, -(0.9 / 300000) * training_number + 1)
 
 def main() :
 	max_episode = 100000
