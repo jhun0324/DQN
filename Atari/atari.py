@@ -55,8 +55,8 @@ def preprocess(state) :
 	return modified_state
 
 def update_e(training_number) :
-	result = max(0.1, -(0.9 / 300000) * training_number + 1)
-	return 0.0
+	result = max(0.1, -(0.9 / 2000000) * training_number + 1)
+	return result
 
 def main() :
 	max_episode = 100000
