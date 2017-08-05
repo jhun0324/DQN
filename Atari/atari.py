@@ -89,7 +89,8 @@ def main() :
 				state = preprocess(state) 
 				states = np.stack((state, state, state, state), axis = 2)
 				total_reward = 0
-				num_random_move = 0
+				num_random_move = 0.0
+				num_game_played = 0
 
 				while True :
 					if np.random.rand(1) < e :
@@ -101,6 +102,9 @@ def main() :
 					new_state, reward, done, _ = env.step(action)
 					new_state = np.reshape(preprocess(new_state), (80, 80, 1))
 					new_states = np.append(new_state, states[:,:,:3], axis = 2)
+
+					if reward != 0 :
+						num_game_played += 1
 
 					replay_buffer.append((states, action, reward, done, new_states))
 					if len(replay_buffer) > REPLAY_MEMORY :
@@ -115,7 +119,7 @@ def main() :
 					elif total_reward > 20 :
 						break
 
-				print("Episode : {} total reward : {} random move {}".format(episode, total_reward, num_random_move))
+				print("Episode : {} total reward : {} random move {}".format(episode, total_reward, num_random_move/num_game_played))
 				training_number += 1
 				rewards_list.append(total_reward)
 
