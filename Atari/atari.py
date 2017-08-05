@@ -89,10 +89,12 @@ def main() :
 				state = preprocess(state) 
 				states = np.stack((state, state, state, state), axis = 2)
 				total_reward = 0
+				num_random_move = 0
 
 				while True :
 					if np.random.rand(1) < e :
 						action = env.action_space.sample()
+						num_random_move += 1
 					else :
 						action = np.argmax(mainDQN.predict(states))
 
@@ -113,7 +115,7 @@ def main() :
 					elif total_reward > 20 :
 						break
 
-				print("Episode : {} total reward : {}".format(episode, total_reward))
+				print("Episode : {} total reward : {} random move {}".format(episode, total_reward, num_random_move))
 				training_number += 1
 				rewards_list.append(total_reward)
 
