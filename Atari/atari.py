@@ -49,8 +49,8 @@ def get_copy_var_ops(*, dest_scope_name = "target", src_scope_name = "main") :
 	return op_holder
 
 def preprocess(state) :
-	state = state.astype(np.uint8)
 	gray_state = np.asarray(cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)) / 255.
+	gray_state = gray_state.astype(np.uint8)
 	gray_state = cv2.threshold(gray_state, 0.40, 1., cv2.THRESH_BINARY)[1]
 	resized_gray_state = cv2.resize(gray_state, (80, 105))
 	modified_state = resized_gray_state[17:97, :]
