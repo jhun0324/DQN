@@ -15,7 +15,7 @@ input_size = 80
 output_size = 6
 
 GAMMA = 0.98
-REPLAY_MEMORY = 40000
+REPLAY_MEMORY = 50000
 REWARD_COUNT = 10
 load = True
 
@@ -50,13 +50,14 @@ def get_copy_var_ops(*, dest_scope_name = "target", src_scope_name = "main") :
 
 def preprocess(state) :
 	gray_state = np.asarray(cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)) / 255.
+	gray_state = cv2.threshold(gray_state, 0.40, 1., cv2.THRESH_BINARY)[1]
 	resized_gray_state = cv2.resize(gray_state, (80, 105))
 	modified_state = resized_gray_state[17:97, :]
 	return modified_state
 
 def update_e(training_number) :
-	result = max(0.1, -(0.9 / 2000000) * training_number + 1)
-	return 0
+	result = max(0.1, -(0.9 / 1000000) * training_number + 1)
+	return result
 
 def main() :
 	max_episode = 100000
