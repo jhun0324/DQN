@@ -3,7 +3,7 @@ import numpy as np
 
 
 class ConvDQN :
-	def __init__(self, sess, input_size = 80, output_size = 6, learning_rate = 0.1, name = 'main') :
+	def __init__(self, sess, input_size = 80, output_size = 6, learning_rate = 1, name = 'main') :
 		'''
 			input_size = one scalr value that represents the height of the preprocessed image (height = width)
 		'''
